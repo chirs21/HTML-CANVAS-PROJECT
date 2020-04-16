@@ -1,7 +1,7 @@
 var canvas = document.getElementById('canvas');
 var c = canvas.getContext('2d');
-canvas.width = window.innerWidth-24;
-canvas.height = window.innerHeight-22;
+canvas.width = window.innerWidth-25 ;
+canvas.height = window.innerHeight-24;
 var healthbarHeight = (240);
 
 var particle =function(x,y,radius){
@@ -10,17 +10,21 @@ var particle =function(x,y,radius){
 	this.radius = radius;
 }
 
-// function sound(src) {
-//   // this.sound = document.createElement("audio");
-//   this.sound.src = src;
-//   // this.sound.setAttribute("preload", "auto");
-//   // this.sound.setAttribute("controls", "none");
-//   this.sound.style.display = "none";
-//   // document.body.appendChild(this.sound);
-//   this.play = function(){
-//     this.sound.play();
-//   }
-// }
+function sound(src) {
+    this.sound = document.createElement("audio");
+    this.sound.src = src;
+    this.sound.style.display = "none";
+    // document.body.appendChild(this.sound);
+    this.play = function(){
+        this.sound.play();
+    }
+    this.stop = function(){
+        this.sound.pause();
+    }    
+}
+
+var mySound = new sound("ball.mp3");
+var mySound1 = new sound("gameover.mp3");
 var atom = new particle(100,100,10);
 
 c.beginPath();
@@ -31,7 +35,7 @@ c.fill();
   
  var alive = -1; 
  var width = window.innerWidth;
- var xspeed = 7; 
+ var xspeed = 8; 
  var yspeed = 5;
  var flagx = 0;  
  var flagy = 0;  
@@ -39,13 +43,14 @@ c.fill();
  var keys = [];
  var posx=70;
  var score=0;
- // var mysound = new sound("hit.mp3");
-                 //Define x direction speed  
+ var state = 1;
+ 
 function draw(){
     //Clears the entire canvas       
      c.clearRect(0,0,window.innerWidth,window.innerHeight);  
     if(alive == -1)
     {
+        state = 1;
     	c.beginPath();
 		c.fillStyle = 'rgba(255,255,255,0.5)';
 		c.font = "50px Arial";
@@ -67,32 +72,35 @@ function draw(){
 
     	if(score < 5)
 	{
-		xspeed = 7.5;
+		xspeed = 8;
 		healthbarHeight = 210;
 	}
 	else if(score < 10)
 	{
-		xspeed = 9.5;
-		healthbarHeight = 180;
+		xspeed = 10;
+		healthbarHeight = 190;
 	}
 	else if(score < 15)
 	{
-		xspeed=11.5;
+		xspeed=13;
 		// yspeed+=1;
-		healthbarHeight = 135;
+		healthbarHeight = 150;
 	}
-	else
+	else if(score < 30)
 	{
-		xspeed = 13.5;
-		// yspeed+=1;
+        xspeed = 15;
 	}
+    else
+    {
+        xspeed = 18;
+    }
     if (keys[38]) {		//up
 			if(posx >= 0)
 			posx-= rectspeed;
 		  }
 	   
 		  if (keys[40]) {		//down
-			if(posx<=(730-healthbarHeight))
+			if(posx<=(window.innerHeight-22-healthbarHeight))
 			posx += rectspeed;
 			
 		  }
@@ -105,21 +113,22 @@ function draw(){
 
 	c.beginPath();
 	c.fillStyle = "#FF0000";
-	c.fillRect(1492, posx, 20, healthbarHeight); 
+	c.fillRect(window.innerWidth-44, posx, 20, healthbarHeight); 
 	
-	xspeed = Math.ceil(Math.random()*5)+xspeed;
-    	if(atom.x>=(window.innerWidth-54))
+	// xspeed = Math.ceil(Math.random()*5)+xspeed;
+    	if(atom.x>=(window.innerWidth-55))
         {
         	 if(atom.y>=(posx-22) && atom.y<=(posx+healthbarHeight+22))
 			{      
         		flagx = 1;
         		score+=1;
-        		// mysound.play();
-        		
+                mySound.play();
+                // mySound.stop();
      		}
      		else
      		{
      			alive = 0;
+                mySound1.play();
      		}
         }
         else if(atom.x<35)
@@ -128,11 +137,14 @@ function draw(){
         	 {
         		flagx=0;
         		score+=1;
-        		xspeed = Math.ceil(Math.random()*5)+xspeed;
+                mySound.play();
+                // mySound.stop();
+        		// xspeed = Math.ceil(Math.random()*5)+xspeed;
         	 }
         	 else
         	 {
         	 	alive =0;
+                mySound1.play();
         	 }
         }
         if(flagx == 1)
@@ -143,12 +155,16 @@ function draw(){
         {
         	atom.x +=xspeed;
         }
-        if(atom.y==(730))
+        if(atom.y==(window.innerHeight-34))
         {
+            // mySound.stop();
+            mySound.play();
         	flagy = 1;
         }
         else if(atom.y==0)
         {
+            // mySound().stop();
+            mySound.play();
         	flagy=0;
         }
         if(flagy==0)
@@ -168,13 +184,12 @@ function draw(){
 }
 else
 {
-
-	c.beginPath();
+        state = 0;
+	   c.beginPath();
 		c.fillStyle = 'rgba(255,255,255,0.5)';
 		c.font = "30px Calibri";
 		c.fillText("GAME OVER!" , (window.innerWidth-20)/2 - 55 , (window.innerHeight-20)/2 - 30);
 		c.fillText("SCORE: " + score , (window.innerWidth-20)/2 - 25 , (window.innerHeight-20)/2 );
-		// score = 0;
 }
 
     requestAnimationFrame(draw);    //Called inside the function
@@ -187,8 +202,11 @@ window.addEventListener("keyup", keysReleased, false);
  
 function keysPressed(e) {
 	// store an entry for every key pressed
+    if(state==1)
+    {
 	keys[e.keyCode] = true;
 	alive = 1;
+    }
 }
  
 function keysReleased(e) {
