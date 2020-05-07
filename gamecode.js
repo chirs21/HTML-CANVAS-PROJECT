@@ -41,9 +41,11 @@ c.fill();
  var flagy = 0;  
  var rectspeed = 7;
  var keys = [];
- var posx=70;
+ var posx1=70;
+ var posx2=70;
  var score=0;
  var state = 1;
+ var winner;
  
 function draw(){
     //Clears the entire canvas       
@@ -54,15 +56,17 @@ function draw(){
     	c.beginPath();
 		c.fillStyle = 'rgba(255,255,255,0.5)';
 		c.font = "50px Arial";
-		c.fillText("MY GAME" , (window.innerWidth-20)/2 - 85 , (window.innerHeight-20)/2 - 70);
+		c.fillText("REBOUNCY" , (window.innerWidth-20)/2 - 120 , (window.innerHeight-20)/2 - 70);
 		c.font = "20px Arial";
-		c.fillText("Chirag Malpani" , (window.innerWidth-20)/2 -45  , (window.innerHeight-20)/2 - 45);
+		c.fillText("Chirag Malpani" , (window.innerWidth-20)/2 -50  , (window.innerHeight-20)/2 - 45);
+        c.font = "20px Arial";
+        c.fillText("Player1 vs Player2" , (window.innerWidth-20)/2 -65  , (window.innerHeight-20)/2 - 15);
 		c.font = "20px Arial";
-		c.fillText("Controls :" , (window.innerWidth-20)/2 - 20 , (window.innerHeight-20)/2 - 15);
-		c.fillText("Arrow Keys  -  Move" , (window.innerWidth-20)/2 - 55 , (window.innerHeight-20)/2 + 10 );
+		c.fillText("Controls :" , (window.innerWidth-20)/2 - 20 , (window.innerHeight-20)/2 +20);
+		c.fillText("P1(w,s) , P2(Arrow Keys)  -  Move" , (window.innerWidth-20)/2 - 125 , (window.innerHeight-20)/2 + 40 );
 		c.font = "15px Arial";
-		c.fillText("Press any key to begin." , (window.innerWidth-20)/2 - 50 , (window.innerHeight-20)/2 + 110);
-		c.fillText("(Sound : On)" , (window.innerWidth-20)/2 - 20 , (window.innerHeight-20)/2 + 125);
+		c.fillText("Press any key to begin." , (window.innerWidth-20)/2 - 50 , (window.innerHeight-20)/2 + 90);
+		c.fillText("(Sound : On)" , (window.innerWidth-20)/2 - 20 , (window.innerHeight-20)/2 + 110);
     }
 
 
@@ -94,31 +98,36 @@ function draw(){
     {
         xspeed = 18;
     }
-    if (keys[38]) {		//up
-			if(posx >= 0)
-			posx-= rectspeed;
+    if (keys[87]) {		//up
+			if(posx1 >= 0)
+			posx1-= rectspeed;
 		  }
 	   
-		  if (keys[40]) {		//down
-			if(posx<=(window.innerHeight-22-healthbarHeight))
-			posx += rectspeed;
-			
+	if (keys[83]) {		//down
+			if(posx1<=(window.innerHeight-22-healthbarHeight))
+			posx1 += rectspeed;
 		  }
-		  var a=posx;
-		  var b=(posx+20);
-
+          if (keys[38]) {       //up
+            if(posx2 >= 0)
+            posx2-= rectspeed;
+          }
+       
+    if (keys[40]) {     //down
+            if(posx2<=(window.innerHeight-22-healthbarHeight))
+            posx2 += rectspeed;
+          }
 		  c.beginPath();
 	c.fillStyle = "#FF0000";
-	c.fillRect(0, posx, 20, healthbarHeight);
+	c.fillRect(0, posx1, 20, healthbarHeight);
 
 	c.beginPath();
 	c.fillStyle = "#FF0000";
-	c.fillRect(window.innerWidth-44, posx, 20, healthbarHeight); 
+	c.fillRect(window.innerWidth-44, posx2, 20, healthbarHeight); 
 	
 	// xspeed = Math.ceil(Math.random()*5)+xspeed;
     	if(atom.x>=(window.innerWidth-55))
         {
-        	 if(atom.y>=(posx-22) && atom.y<=(posx+healthbarHeight+22))
+        	 if(atom.y>=(posx2-22) && atom.y<=(posx2+healthbarHeight+22))
 			{      
         		flagx = 1;
         		score+=1;
@@ -129,20 +138,20 @@ function draw(){
      		{
      			alive = 0;
                 mySound1.play();
+                winner = 1;
      		}
         }
         else if(atom.x<35)
         {
-        	 if(atom.y>=(posx-22) && atom.y<=(posx+healthbarHeight+22))
+        	 if(atom.y>=(posx1-22) && atom.y<=(posx1+healthbarHeight+22))
         	 {
         		flagx=0;
         		score+=1;
                 mySound.play();
-                // mySound.stop();
-        		// xspeed = Math.ceil(Math.random()*5)+xspeed;
         	 }
         	 else
         	 {
+                winner = 2;
         	 	alive =0;
                 mySound1.play();
         	 }
@@ -157,13 +166,11 @@ function draw(){
         }
         if(atom.y==(window.innerHeight-34))
         {
-            // mySound.stop();
             mySound.play();
         	flagy = 1;
         }
         else if(atom.y==0)
         {
-            // mySound().stop();
             mySound.play();
         	flagy=0;
         }
@@ -189,7 +196,14 @@ else
 		c.fillStyle = 'rgba(255,255,255,0.5)';
 		c.font = "30px Calibri";
 		c.fillText("GAME OVER!" , (window.innerWidth-20)/2 - 55 , (window.innerHeight-20)/2 - 30);
-		c.fillText("SCORE: " + score , (window.innerWidth-20)/2 - 25 , (window.innerHeight-20)/2 );
+        if(winner==1)
+        {
+		  c.fillText("Player 1 wins!", (window.innerWidth-20)/2 - 60 , (window.innerHeight-20)/2+10 );
+        }
+        else
+        {
+            c.fillText("Player 2 wins!", (window.innerWidth-20)/2 - 60 , (window.innerHeight-20)/2+10 );   
+        }
 }
 
     requestAnimationFrame(draw);    //Called inside the function
